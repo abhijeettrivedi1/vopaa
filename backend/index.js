@@ -93,16 +93,17 @@ app.get("/teacherHome", (req, res) => {
   const token = req.cookies.token;
   console.log(token);
   if (!token) {
-    // res.redirect("/loginTeacher");
     console.log("No token")
+    res.redirect("/loginTeacher");
+    
   } else {
     jwt.verify(token, jwtSecret, (error, decodedToken) => {
       const tid = decodedToken.id;
-      //console.log(decodedToken.id)
-      // console.log(typeof(JSON.stringify(decodedToken.id)))
+      console.log(decodedToken.id)
+      console.log(typeof(JSON.stringify(decodedToken.id)))
       //const tid = req.body.tid;
-      //   console.log(typeof(tid))
-      //  console.log(tid)
+        // console.log(typeof(tid))
+       console.log(tid)
       Student.find({ teachers: tid }).then((result) => {
         console.log(result), res.json(result);
       });

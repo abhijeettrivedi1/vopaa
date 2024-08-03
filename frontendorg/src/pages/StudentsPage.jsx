@@ -14,6 +14,7 @@ const StudentPage = () => {
     const fetchStudents = async () => {
       try {
         const response = await axios.get('/teacherHome', { withCredentials: true });
+      
         setStudents(response.data);
         setFilteredStudents(response.data); // Initially set filtered students to all students
       } catch (err) {
