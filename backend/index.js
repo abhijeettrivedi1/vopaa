@@ -19,7 +19,15 @@ const Test = require('./models/test')
 app.use(
   cors({
     origin: true, // Allow all origins
-    credentials: true,
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+    ], // Allowed headers
   })
 );
 mongoose.connect(process.env.mongo_uri)
