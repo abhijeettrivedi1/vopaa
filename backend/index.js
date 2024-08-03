@@ -19,15 +19,7 @@ const Test = require('./models/test')
 app.use(
   cors({
     origin: true, // Allow all origins
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-Requested-With",
-      "Accept",
-      "Origin",
-    ], // Allowed headers
+    credentials: true,
   })
 );
 mongoose.connect(process.env.mongo_uri)
@@ -95,15 +87,15 @@ app.get("/teacherHome", (req, res) => {
   if (!token) {
     console.log("No token")
     res.redirect("/loginTeacher");
-    
+
   } else {
     jwt.verify(token, jwtSecret, (error, decodedToken) => {
       const tid = decodedToken.id;
       console.log(decodedToken.id)
-      console.log(typeof(JSON.stringify(decodedToken.id)))
+      console.log(typeof (JSON.stringify(decodedToken.id)))
       //const tid = req.body.tid;
-        // console.log(typeof(tid))
-       console.log(tid)
+      // console.log(typeof(tid))
+      console.log(tid)
       Student.find({ teachers: tid }).then((result) => {
         console.log(result), res.json(result);
       });
@@ -124,8 +116,14 @@ app.post("/loginTeacher", async (req, res) => {
         if (err) throw err;
         else {
           console.log("at login");
-          res.cookie('token', token, { secure:true, httpOnly: true })
-   .json({ teacherId });
+          res.cookie('token', token, {
+            expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
+            maxAge: accessTokenExpire * 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: "none",
+            secure: true
+          })
+            .json({ teacherId });
           console.log("at login 2");
         }
       });
