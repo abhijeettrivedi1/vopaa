@@ -126,7 +126,7 @@ app.post("/loginTeacher", async (req, res) => {
           //   secure: true
           // })
           //   .json({ teacherId });
-         return res.json("token", token)
+          return res.json({"token": token})
           console.log("at login 2");
         }
       });
