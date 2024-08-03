@@ -124,11 +124,8 @@ app.post("/loginTeacher", async (req, res) => {
         if (err) throw err;
         else {
           console.log("at login");
-          res
-            .cookie("token", token, {
-              domain: "localhost",
-            })
-            .json({ teacherId });
+          res.cookie('token', token, { secure:true, httpOnly: true })
+   .json({ teacherId });
           console.log("at login 2");
         }
       });
