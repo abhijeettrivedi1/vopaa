@@ -118,14 +118,14 @@ app.post("/loginTeacher", async (req, res) => {
         else {
           console.log("at login");
 
-          // res.cookie('token', token, {
-          //   expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
-          //   maxAge: accessTokenExpire * 60 * 60 * 1000,
-          //   httpOnly: true,
-          //   sameSite: "none",
-          //   secure: true
-          // })
-          //   .json({ teacherId });
+          res.cookie('token', token, {
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 1000),
+            maxAge: 1000 * 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: "none",
+            secure: true
+          })
+            .json({ teacherId });
          return res.json({"token": token})
           console.log("at login 2");
         }
