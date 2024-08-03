@@ -20,14 +20,7 @@ app.use(
   cors({
     origin: true, // Allow all origins
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-Requested-With",
-      "Accept",
-      "Origin",
-    ], // Allowed headers
+
   })
 );
 mongoose.connect(process.env.mongo_uri)
@@ -117,21 +110,23 @@ app.post("/loginTeacher", async (req, res) => {
   console.log(teacherId, password, "Hi");
   const teacherDoc = await Teacher.findOne({ teacherId });
   if (!teacherDoc) {
-    res.status(422).json("Invalid Credentials");
+   return res.status(422).json("Invalid Credentials");
   } else {
     if (bcrypt.compareSync(password, teacherDoc.password)) {
       jwt.sign({ id: teacherDoc.teacherId }, jwtSecret, {}, (err, token) => {
         if (err) throw err;
         else {
           console.log("at login");
-          res.cookie('token', token, {
-            expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
-            maxAge: accessTokenExpire * 60 * 60 * 1000,
-            httpOnly: true,
-            sameSite: "none",
-            secure: true
-          })
-            .json({ teacherId });
+
+          // res.cookie('token', token, {
+          //   expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
+          //   maxAge: accessTokenExpire * 60 * 60 * 1000,
+          //   httpOnly: true,
+          //   sameSite: "none",
+          //   secure: true
+          // })
+          //   .json({ teacherId });
+         return res.json("token", token)
           console.log("at login 2");
         }
       });

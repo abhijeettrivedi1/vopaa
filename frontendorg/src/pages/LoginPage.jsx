@@ -19,6 +19,7 @@ const LoginPage = () => {
         password,
       });
       setUser(response.data);
+      localStorage.setItem('token',response.data.token);
       setMessage("Success");
     } catch (error) {
       setMessage('Error: Unable to login');
