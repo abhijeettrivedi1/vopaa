@@ -10,7 +10,7 @@ const RegisterPage = () => {
   const [subject, setSubject] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const { setUser, user } = useContext(Usercontext);
+  const {  user } = useContext(Usercontext);
 
 
   const handleSubmit = async (e) => {
@@ -23,7 +23,7 @@ const RegisterPage = () => {
         password,
       });
       setMessage(response.data.message);
-      setUser(teacherId);
+      // setUser(teacherId);
     } catch (error) {
       setMessage('Error: Unable to register');
     }
