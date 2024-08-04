@@ -78,7 +78,12 @@ app.get("/logoutTeacher", (req, res) => {
   console.log("here");
   //  res.cookie('token' , '',{maxAge:1})
   // res.redirect('/loginTeacher')
-  res.cookie('token', '', { expires: new Date(0) }).json(true);
+  res.cookie('token', '', {
+        expires: new Date(0), // Expire the cookie immediately
+        httpOnly: true,
+        sameSite: "none",
+        secure: true
+    }).json({ success: true });
 });
 
 // rendering all the students registered under a teacher, accross different standards(classes)
