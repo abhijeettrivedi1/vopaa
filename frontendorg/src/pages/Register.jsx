@@ -10,9 +10,9 @@ const RegisterPage = () => {
   const [subject, setSubject] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const { setUser, user } = useContext(Usercontext);
+  const {  user } = useContext(Usercontext);
 
-
+  const [redirect,setRedirect]=useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -22,15 +22,18 @@ const RegisterPage = () => {
         subject,
         password,
       });
-      setMessage(response.data.message);
-      setUser(teacherId);
+      console.log(response);
+      setMessage("teacher created successfully");
+      setRedirect(true)
+      // setUser(teacherId);
     } catch (error) {
-      setMessage('Error: Unable to register');
+      console.log(error)
+      setMessage("Unable to Register");
     }
   };
-  if (user) {
+  if (redirect) {
     return (
-      <Navigate to="/" />
+      <Navigate to="/login" />
     );
   }
 

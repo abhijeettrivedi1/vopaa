@@ -44,6 +44,9 @@ const IndexPage = () => {
                     <NavLink to="/students">
                         <button>Students</button>
                     </NavLink>
+                    <NavLink to="/createtest">
+                        <button>CreateTest</button>
+                    </NavLink>
                 </div>
                 <img src="/student.webp" alt="Student Image" />
             </div>

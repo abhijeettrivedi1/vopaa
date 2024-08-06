@@ -60,6 +60,11 @@ app.get("/profile", (req, res) => {
 //registering a teacher on the database
 app.post("/registerTeacher", async (req, res) => {
   const { teacherId, subject, password } = req.body;
+  const teacherDoc = await Teacher.findOne({ teacherId });
+  if (teacherDoc) {
+    console.log("teacher")
+    return res.status(422).json({ message: "Teacher ID already exists" });
+  }
   try {
     const teacherDoc = await Teacher.create({
       teacherId,
@@ -78,12 +83,13 @@ app.get("/logoutTeacher", (req, res) => {
   console.log("here");
   //  res.cookie('token' , '',{maxAge:1})
   // res.redirect('/loginTeacher')
-  res.cookie("token", "").json(true);
+  res.cookie('token', '', { expires: new Date(0) }).json(true);
 });
 
 // rendering all the students registered under a teacher, accross different standards(classes)
 app.get("/teacherHome", (req, res) => {
   const token = req.cookies.token;
+
   console.log(token);
   if (!token) {
     console.log("No token")

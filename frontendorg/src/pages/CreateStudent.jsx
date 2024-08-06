@@ -39,6 +39,7 @@ const CreateStudent = () => {
 
     return (
         <div className="form-container">
+            <Link to="/students" className="back-btn">Back</Link>
             <Toaster position="bottom-center" reverseOrder={false} />
             <h2>Create Student</h2>
             <form onSubmit={handleFormSubmit}>

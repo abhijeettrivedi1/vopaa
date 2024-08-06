@@ -22,7 +22,7 @@ const LoginPage = () => {
       localStorage.setItem('token',response.data.token);
       setMessage("Success");
     } catch (error) {
-      setMessage('Error: Unable to login');
+      setMessage('Invalid Credentials');
     }
   };
 
