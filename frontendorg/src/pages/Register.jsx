@@ -10,8 +10,10 @@ const RegisterPage = () => {
   const [subject, setSubject] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  
   const {  user } = useContext(Usercontext);
 
+  
   const [redirect,setRedirect]=useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
