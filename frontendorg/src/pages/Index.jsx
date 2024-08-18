@@ -17,7 +17,10 @@ const IndexPage = () => {
     };
 
     if (!ready) {
-        return <div className="spinner"></div>;
+        return 
+        <div className="spinner-container">    
+            <div className="spinner"></div>;
+        </div>
     }
     
     if (!user) {
