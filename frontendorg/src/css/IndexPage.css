@@ -76,6 +76,15 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f5; /* Optional: Set a background color */
+    text-align: center;
+}
+
 .spinner {
     border: 16px solid #f3f3f3;
     border-radius: 50%;
@@ -89,4 +98,18 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.loaded-text {
+    font-family: 'YourCustomFont', sans-serif; /* Replace with your custom font */
+    font-size: 24px;
+    color: #333;
+}
+
+/* Optional: Add a custom font by importing it */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+    font-family: 'Roboto', sans-serif;  /* Apply globally */
+}
+
 
