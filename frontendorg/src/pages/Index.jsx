@@ -16,7 +16,7 @@ const IndexPage = () => {
         }
     };
 
-    if (!ready) {
+    if (!false) {
         return 
         <div className="spinner-container">
         <Oval
