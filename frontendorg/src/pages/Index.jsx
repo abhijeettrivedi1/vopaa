@@ -3,7 +3,7 @@ import { Usercontext } from '../usercontext';
 import axios from 'axios';
 import '../css/IndexPage.css';
 import { Navigate, NavLink } from 'react-router-dom';
-
+import { Oval } from 'react-loader-spinner';
 const IndexPage = () => {
     const { user, setUser, ready } = useContext(Usercontext);
 
@@ -18,9 +18,20 @@ const IndexPage = () => {
 
     if (!ready) {
         return 
-        <div className="spinner-container">    
-            <div className="spinner"></div>;
-        </div>
+        <div className="spinner-container">
+        <Oval
+            height={80}
+            width={80}
+            color="#4fa94d"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+            ariaLabel="oval-loading"
+            secondaryColor="#4fa94d"
+            strokeWidth={2}
+            strokeWidthSecondary={2}
+        />
+    </div>
     }
     
     if (!user) {
