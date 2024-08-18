@@ -1,53 +1,76 @@
 import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
-import toast, { Toaster } from 'react-hot-toast'; // Toast notifications
+import toast, { Toaster } from 'react-hot-toast';
 import { useParams, Link } from 'react-router-dom';
-import '../css/TestPage.css'; // Import CSS file for styling
-const url=import.meta.env.VITE_PYTHON_BASE_URL
+import '../css/TestPage.css';
+
+const url = import.meta.env.VITE_PYTHON_BASE_URL;
+
 const TestPage = () => {
     const [selectedOption, setSelectedOption] = useState('story');
     const [result, setResult] = useState(false);
     const [percentage, setPercentage] = useState(0);
-    const [text, setText] = useState('माझं नाव राजू आहे.'); // Initial text
-    const [language, setLanguage] = useState('Hindi'); // Default language
-    const [level, setLevel] = useState(4); // Default level
-    const fileInputRef = useRef(null);
+    const [text, setText] = useState('माझं नाव राजू आहे.');
+    const [language, setLanguage] = useState('Hindi');
+    const [level, setLevel] = useState(4);
+    const [recording, setRecording] = useState(false);
+    const [audioBlob, setAudioBlob] = useState(null);
+    const mediaRecorderRef = useRef(null);
+    const audioRef = useRef(null);
     const { id } = useParams();
 
     useEffect(() => {
-        fetchTestText(); // Fetch test text when component mounts or when language/level changes
-    }, [language, level]); // Dependencies: language and level
-    
+        fetchTestText();
+    }, [language, level]);
+
     const fetchTestText = async () => {
         try {
             const response = await axios.post('/test', {
                 level,
                 langType: language
             });
-
-            setText(response.data); // Set the fetched text to the state
+            
+            setText(response.data);
         } catch (error) {
             console.error('Error fetching test text:', error);
-            // Handle error (e.g., show a toast notification)
             toast.error('Failed to fetch test text. Please try again.');
         }
     };
 
-    const handleFileUpload = async (e) => {
-        e.preventDefault();
+    const handleStartRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorderRef.current = new MediaRecorder(stream, {
+                mimeType: 'audio/webm' // Use 'audio/webm' or 'audio/ogg'
+            });
+            mediaRecorderRef.current.ondataavailable = (event) => {
+                const blob = new Blob([event.data], { type: 'audio/webm' });
+                setAudioBlob(blob);
+            };
+            mediaRecorderRef.current.start();
+            setRecording(true);
+        } catch (error) {
+            console.error('Error accessing microphone:', error);
+            toast.error('Failed to start recording. Please try again.');
+        }
+    };
 
-        const file = fileInputRef.current.files[0];
-        console.log(file);
-        if (!file) {
-            console.error('No file selected!');
+    const handleStopRecording = () => {
+        mediaRecorderRef.current.stop();
+        setRecording(false);
+    };
+
+    const handleUploadAudio = async () => {
+        if (!audioBlob) {
+            toast.error('No audio recorded!');
             return;
         }
-        
+
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', audioBlob, 'recording.webm'); // Save as .webm file
         formData.append('language', language);
         formData.append('text', text);
-        
+
         try {
             const response = await fetch(`${url}/upload`, {
                 method: 'POST',
@@ -57,43 +80,38 @@ const TestPage = () => {
             if (!response.ok) {
                 throw new Error(`Upload failed with status ${response.status}`);
             }
-            
+
             const data = await response.json();
             console.log('Upload response:', data);
-            
-            try {
-                const r = await fetch(`${url}/grade`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        reference_text: text,
-                        language
-                    })
-                });
 
-                if (!r.ok) {
-                    throw new Error(`Error while grading`);
-                }
+            const gradeResponse = await fetch(`${url}/grade`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    reference_text: text,
+                    language
+                })
+            });
 
-                const d = await r.json();
-                console.log('Grading response:', d);
-
-                if (d.Message === 'Pass') {
-                    toast.success('Passed');
-                    updateStudentLevel(); // Call function to update student level
-                } else {
-                    setLevel(lev => lev-1);
-                    toast.error('Failed');
-                }
-
-            } catch (error) {
-                console.error('Error uploading file:', error);
+            if (!gradeResponse.ok) {
+                throw new Error('Error while grading');
             }
 
+            const gradeData = await gradeResponse.json();
+            console.log('Grading response:', gradeData);
+
+            if (gradeData.Message === 'Pass') {
+                toast.success('Passed');
+                updateStudentLevel();
+            } else {
+                setLevel((prevLevel) => prevLevel - 1);
+                toast.error('Failed');
+            }
         } catch (error) {
-            console.error('Error uploading file:', error);
+            console.error('Error uploading or grading audio:', error);
+            toast.error('Failed to process audio. Please try again.');
         }
     };
 
@@ -108,73 +126,60 @@ const TestPage = () => {
     const updateStudentLevel = async () => {
         try {
             const response = await axios.post('/changeStudentLevel', {
-                studentId: id, // Assuming id is the student's ID you want to update
-                newLevel: parseInt(level)  // Example: Increase level by 1
+                studentId: id,
+                newLevel: parseInt(level)
             });
-
+            
             console.log('Updated student level:', response.data);
-            // Optionally update state or handle success
         } catch (error) {
             console.error('Error updating student level:', error);
-            // Handle error (e.g., show a toast notification)
             toast.error('Failed to update student level. Please try again.');
         }
     };
 
     return (
         <div className="TestPage">
-            <Toaster
-                position="bottom-center"
-                reverseOrder={false}
-            />
+            <Toaster position="bottom-center" reverseOrder={false} />
             <div className="header">
                 <Link to="/students" className="back-btn">Back</Link>
-                
             </div>
             <h1>TEST</h1>
-            {/* Language and Level Dropdowns */}
             <div className="dropdowns">
                 <div>
                     <label htmlFor="languageSelect">Select Language: </label>
                     <select id="languageSelect" value={language} onChange={handleLanguageChange}>
                         <option value="Hindi">Hindi</option>
                         <option value="English">English</option>
-                        {/* Add more language options as needed */}
                     </select>
-
                     <label htmlFor="levelSelect">Select Level: </label>
                     <select id="levelSelect" value={level} onChange={handleLevelChange}>
                         <option value={1}>Level 1</option>
                         <option value={2}>Level 2</option>
                         <option value={3}>Level 3</option>
                         <option value={4}>Level 4</option>
-                        {/* Add more level options as needed */}
                     </select>
-                
                 </div>
-                
             </div>
-            
             <div className="form">
-                <form id="uploadForm" onSubmit={handleFileUpload}>
-                    
-                    <textarea
-                        value={text}
-                        style={{ height: '200px', width: '500px', fontSize: '18px' }}
-                        readOnly // Use readOnly instead of contentEditable
-                    />
-
-                    <br />
-                    Select File:
-                    <input type="file" id="myFile" name="filename" ref={fileInputRef} />
-                    <input type="submit" value="Upload" />
-                </form>
+                <textarea
+                    value={text}
+                    style={{ height: '200px', width: '500px', fontSize: '18px' }}
+                    readOnly
+                />
+                <br />
+                {recording ? (
+                    <button onClick={handleStopRecording}>Stop Recording</button>
+                ) : (
+                    <button onClick={handleStartRecording}>Start Recording</button>
+                )}
+                {audioBlob && (
+                    <>
+                        <audio ref={audioRef} controls src={URL.createObjectURL(audioBlob)} />
+                        <button onClick={handleUploadAudio}>Upload Audio</button>
+                    </>
+                )}
             </div>
-
-            {/* Display result and percentage */}
-            {result && (
-                <p>{result}, {percentage}</p>
-            )}
+            {result && <p>{result}, {percentage}</p>}
         </div>
     );
 };
